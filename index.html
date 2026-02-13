@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Bebo & Bebi 💖</title>
+
+<style>
+body{
+  margin:0;
+  padding:0;
+  font-family:Georgia,serif;
+  background:linear-gradient(135deg,#f8e1e7,#fcefee);
+  height:100vh;
+  overflow:hidden;
+  color:#7a284f;
+  position:relative;
+}
+
+/* HEARTS */
+#heartContainer{
+  position:fixed;
+  top:20px;
+  left:50%;
+  transform:translateX(-50%);
+  font-size:60px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  transition:top 2s ease, transform 2s ease;
+}
+
+.heart{
+  transition:opacity 3s ease, transform 3s ease;
+}
+
+.centered{
+  top:50%;
+  transform:translate(-50%, -50%);
+}
+
+.pulse{
+  animation:pulse 1.5s infinite;
+}
+
+@keyframes pulse{
+  0%{transform:scale(1);}
+  50%{transform:scale(1.15);}
+  100%{transform:scale(1);}
+}
+
+/* BUTTONS */
+button{
+  font-size:18px;
+  padding:14px 30px;
+  margin:10px;
+  border:none;
+  border-radius:30px;
+  cursor:pointer;
+  transition:transform 0.6s ease;
+}
+#yes{background:#b76e79;color:white;}
+#no{background:#c4a3b6;color:white;}
+
+/* SECTIONS */
+.section{
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%, -50%);
+  opacity:0;
+  display:none;
+  transition:opacity 3s ease;
+  text-align:center;
+  width:80%;
+}
+.visible{
+  display:block;
+  opacity:1;
+}
+
+/* BLACK FADE */
+#blackFade{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:black;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 5.5s ease;
+}
+</style>
+</head>
+
+<body>
+
+<div id="heartContainer">
+  <span id="heart1" class="heart">💖</span>
+  <span id="heart2" class="heart">💖</span>
+</div>
+
+<div id="mainContent" class="section visible">
+  <h1>Bebo…</h1>
+  <h2>Will you be my Valentine?</h2>
+  <button id="yes">Yessss</button>
+  <button id="no">Noooo :C</button>
+</div>
+
+<div id="locked" class="section">
+  Agreement Confirmed.<br>
+  Bebo is now permanently registered as Bebi’s Valentine.<br>
+  Contract Duration: Forever. 💍
+</div>
+
+<div id="reasonsSection" class="section">
+  <h2>CORE REASONS WHY ILYSM &lt;3333</h2>
+  <div id="reasonText" style="margin-top:20px;font-size:20px;"></div>
+</div>
+
+<div id="finalMessage" class="section" style="font-size:28px;">
+  Happy Valentine’s, Bebo. 💖
+</div>
+
+<div id="blackFade"></div>
+
+<audio id="ourSong" src="our-song.mp3" autoplay></audio>
+
+<script>
+
+/* AUTOPLAY SAFETY */
+window.addEventListener("click", function(){
+  const song=document.getElementById("ourSong");
+  if(song.paused){
+    song.play();
+  }
+},{ once:true });
+
+function showSection(el){
+  el.style.display="block";
+  setTimeout(()=>el.style.opacity="1",50);
+}
+function hideSection(el){
+  el.style.opacity="0";
+  setTimeout(()=>el.style.display="none",3000);
+}
+
+const yesBtn=document.getElementById("yes");
+const noBtn=document.getElementById("no");
+
+yesBtn.addEventListener("click", yesSequence);
+noBtn.addEventListener("click", sadReaction);
+
+/* YES SEQUENCE */
+function yesSequence(){
+
+  const main=document.getElementById("mainContent");
+  const locked=document.getElementById("locked");
+  const reasons=document.getElementById("reasonsSection");
+  const finalMessage=document.getElementById("finalMessage");
+  const heartContainer=document.getElementById("heartContainer");
+  const heart2=document.getElementById("heart2");
+  const heart1=document.getElementById("heart1");
+
+  hideSection(main);
+
+  /* Merge hearts (earlier timing) */
+  setTimeout(()=>{
+    heart2.style.opacity="0";
+    heart2.style.position="absolute"; /* Remove from flex layout */
+  },1500);
+
+  setTimeout(()=>{
+    heartContainer.classList.add("centered");
+  },3000);
+
+  setTimeout(()=>{
+    heart1.classList.add("pulse");
+  },4500);
+
+  setTimeout(()=>{
+    showSection(locked);
+  },6500);
+
+  setTimeout(()=>{
+    hideSection(locked);
+    showSection(reasons);
+    startReasons(finalMessage);
+  },10500);
+}
+
+/* NO BEHAVIOR */
+let noClicks=0;
+function sadReaction(){
+
+  noClicks++;
+
+  let noScale=Math.max(0,1 - noClicks*0.2);
+  let yesScale=1 + noClicks*0.2;
+
+  noBtn.style.transform=`scale(${noScale})`;
+  yesBtn.style.transform=`scale(${yesScale})`;
+
+  if(noScale <= 0.2){
+    noBtn.style.display="none";
+  }
+}
+
+/* REASONS SYSTEM */
+const reasonsList=[
+"Because you sent me request that day.",
+"Because your smile fixes my worst days.",
+"Because you just match my energy.",
+"Because life feels better with you.",
+"Because you're my favorite person."
+];
+
+function startReasons(finalMessage){
+
+  let index=0;
+  const text=document.getElementById("reasonText");
+
+  function showNext(){
+
+    if(index >= reasonsList.length){
+      setTimeout(()=>{
+        hideSection(document.getElementById("reasonsSection"));
+        showSection(finalMessage);
+
+        setTimeout(()=>{
+          document.getElementById("blackFade").style.opacity="1";
+        },6000);
+
+      },2500);
+      return;
+    }
+
+    text.style.opacity="0";
+
+    setTimeout(()=>{
+      text.innerHTML=reasonsList[index];
+      text.style.transition="opacity 2.5s ease";
+      text.style.opacity="1";
+    },2500);
+
+    setTimeout(()=>{
+      text.style.opacity="0";
+      index++;
+      setTimeout(showNext,2500);
+    },7500);
+  }
+
+  showNext();
+}
+
+</script>
+</body>
+</html>
